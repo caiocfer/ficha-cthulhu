@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficha de Investigador - Chamado de Cthulhu 7E (1920s)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar no-print">
+      <div class="brand">
+        <h1>Chamado de Cthulhu 7ª Edição</h1>
+        <p class="subtitle">Ficha de Investigador — Anos 1920</p>
+      </div>
+      <div class="topbar-actions">
+        <span id="saveStatus" class="save-status" aria-live="polite">Salvo</span>
+        <button id="themeToggle" class="btn tonal" type="button" title="Alternar tema">Tema: Claro</button>
+        <button id="exportJsonBtn" class="btn tonal" type="button">Exportar JSON</button>
+        <label class="btn tonal file-label" for="importJsonInput">Importar JSON<input id="importJsonInput" type="file" accept="application/json,.json" hidden></label>
+        <button id="exportPdfBtn" class="btn primary" type="button">Exportar PDF</button>
+        <button id="resetBtn" class="btn danger" type="button">Limpar ficha</button>
+      </div>
+    </header>
+
+    <main id="sheet" class="sheet">
+      <section class="card section-info" aria-labelledby="sec-info">
+        <div class="section-header"><h2 id="sec-info">Dados do Investigador</h2></div>
+        <div class="info-grid">
+          <div class="portrait-block">
+            <div class="portrait-frame">
+              <img id="portraitPreview" alt="Retrato do investigador" />
+              <div id="portraitPlaceholder" class="portrait-placeholder">Retrato</div>
+            </div>
+            <div class="portrait-actions no-print">
+              <label class="btn small tonal" for="portraitInput">Enviar foto<input id="portraitInput" type="file" accept="image/*" hidden></label>
+              <button id="removePortraitBtn" class="btn small text" type="button">Remover</button>
+            </div>
+          </div>
+          <div class="fields-grid info-fields">
+            <label>Nome <input type="text" data-path="info.nome" placeholder="Nome do investigador"></label>
+            <label>Jogador(a) <input type="text" data-path="info.jogador" placeholder="Nome do jogador"></label>
+            <label>Ocupação <input type="text" data-path="info.ocupacao" placeholder="Ex.: Engenheiro"></label>
+            <label>Idade <input type="number" min="0" data-path="info.idade" placeholder="Idade"></label>
+            <label>Sexo <input type="text" data-path="info.sexo" placeholder="Sexo"></label>
+            <label>Residência <input type="text" data-path="info.residencia" placeholder="Cidade"></label>
+            <label>Local de Nascimento <input type="text" data-path="info.nascimento" placeholder="Local de nascimento"></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section-attrs" aria-labelledby="sec-attrs">
+        <div class="section-header"><h2 id="sec-attrs">Características</h2></div>
+        <div id="characteristicsGrid" class="characteristics-grid"></div>
+      </section>
+
+      <section class="card section-derived" aria-labelledby="sec-derived">
+        <div class="section-header"><h2 id="sec-derived">Atributos Derivados</h2></div>
+        <div class="derived-grid">
+          <div class="derived-card tracker" id="hpCard">
+            <h3>Pontos de Vida (PV)</h3>
+            <div class="tracker-row"><span>Máx: <strong id="hpMax" class="num">-</strong></span></div>
+            <label>Atual <input type="number" data-path="trackers.hpCurrent" class="num-input"></label>
+            <div class="checks">
+              <label><input type="checkbox" data-path="trackers.lesaoGrave"> Lesão Grave</label>
+              <label><input type="checkbox" data-path="trackers.morrendo"> Morrendo</label>
+            </div>
+          </div>
+          <div class="derived-card tracker" id="mpCard">
+            <h3>Pontos de Magia (PM)</h3>
+            <div class="tracker-row"><span>Máx: <strong id="mpMax" class="num">-</strong></span></div>
+            <label>Atual <input type="number" data-path="trackers.mpCurrent" class="num-input"></label>
+          </div>
+          <div class="derived-card tracker" id="sanCard">
+            <h3>Sanidade (SAN)</h3>
+            <div class="tracker-row multi">
+              <span>Inicial: <strong id="sanStart" class="num">-</strong></span>
+              <span>Máxima: <strong id="sanMax" class="num">-</strong></span>
+            </div>
+            <label>Atual <input type="number" data-path="trackers.sanCurrent" class="num-input"></label>
+            <div class="checks">
+              <label><input type="checkbox" data-path="trackers.insanidadeTemp"> Insanidade Temporária</label>
+              <label><input type="checkbox" data-path="trackers.insanidadeIndef"> Insanidade Indefinida</label>
+            </div>
+          </div>
+          <div class="derived-card tracker" id="luckCard">
+            <h3>Sorte</h3>
+            <label>Atual / Inicial <input type="number" data-path="trackers.luckCurrent" class="num-input"></label>
+          </div>
+          <div class="derived-card" id="movCard">
+            <h3>Taxa de Movimento (MOV)</h3>
+            <div class="tracker-row"><span>Auto: <strong id="movAuto" class="num">-</strong></span> <span>Efetivo: <strong id="movEffective" class="num">-</strong></span></div>
+            <label class="inline-check"><input type="checkbox" data-path="trackers.movOverride"> Ajuste manual</label>
+            <label>Valor manual <input type="number" data-path="trackers.movManual" class="num-input"></label>
+          </div>
+          <div class="derived-card" id="buildCard">
+            <h3>Dano Extra e Corpo</h3>
+            <div class="stat-pair"><span>Dano Extra (DB): <strong id="dbValue" class="num">-</strong></span></div>
+            <div class="stat-pair"><span>Corpo (Build): <strong id="buildValue" class="num">-</strong></span></div>
+            <div class="hint">Baseado em FOR + TAM</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section-skills" aria-labelledby="sec-skills">
+        <div class="section-header"><h2 id="sec-skills">Perícias</h2></div>
+        <div class="skill-pools" id="skillPoolsBar">
+          <div class="pool">
+            <div class="pool-title">Pontos de Ocupação</div>
+            <div class="pool-values"><span id="occAllocated">0</span> / <input type="number" id="occMax" data-path="pools.occMax" class="num-input small" min="0"></div>
+            <div id="occStatus" class="pool-status"></div>
+          </div>
+          <div class="pool">
+            <div class="pool-title">Pontos de Interesse Pessoal</div>
+            <div class="pool-values"><span id="persAllocated">0</span> / <input type="number" id="persMax" data-path="pools.persMax" class="num-input small" min="0"></div>
+            <div class="pool-hint">Sugestão: INT × 2 (<span id="persSuggested">-</span>)</div>
+            <div id="persStatus" class="pool-status"></div>
+          </div>
+          <div class="pool-actions no-print">
+            <button id="addCustomSkillBtn" class="btn small tonal" type="button">+ Perícia personalizada</button>
+          </div>
+        </div>
+        <div class="skills-table-wrap">
+          <table class="skills-table">
+            <thead>
+              <tr>
+                <th class="col-check" title="Melhoria">✓</th>
+                <th class="col-name">Perícia</th>
+                <th class="col-num">Base</th>
+                <th class="col-num">Ocupação</th>
+                <th class="col-num">Pessoal</th>
+                <th class="col-num">Total</th>
+                <th class="col-num">1/2</th>
+                <th class="col-num">1/5</th>
+                <th class="col-actions no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="skillsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card section-combat" aria-labelledby="sec-combat">
+        <div class="section-header"><h2 id="sec-combat">Combate e Armas</h2></div>
+        <div class="combat-summary">Desarmado: usa <strong>Lutar (Briga)</strong> — Dano <strong>1D3 + DB</strong> (<span id="unarmedDamage">-</span>)</div>
+        <div class="table-wrap">
+          <table class="weapons-table">
+            <thead>
+              <tr>
+                <th>Arma</th>
+                <th>Perícia Associada</th>
+                <th>Dano</th>
+                <th>Alcance</th>
+                <th>Ataques/Rd</th>
+                <th>Munição</th>
+                <th>Defeito</th>
+                <th class="no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="weaponsBody"></tbody>
+          </table>
+        </div>
+        <div class="no-print"><button id="addWeaponBtn" class="btn small tonal" type="button">+ Adicionar arma</button></div>
+      </section>
+
+      <section class="card section-backstory" aria-labelledby="sec-backstory">
+        <div class="section-header"><h2 id="sec-backstory">Antecedentes (História Pessoal)</h2></div>
+        <div class="backstory-grid">
+          <label>Descrição Pessoal <textarea data-path="backstory.descricao"></textarea></label>
+          <label>Ideologia / Crenças <textarea data-path="backstory.ideologia"></textarea></label>
+          <label>Pessoas Significativas <textarea data-path="backstory.pessoas"></textarea></label>
+          <label>Locais Importantes <textarea data-path="backstory.locais"></textarea></label>
+          <label>Pertences Queridos <textarea data-path="backstory.pertences"></textarea></label>
+          <label>Traços <textarea data-path="backstory.tracos"></textarea></label>
+          <label>Ferimentos / Cicatrizes <textarea data-path="backstory.ferimentos"></textarea></label>
+          <label>Fobias / Manias <textarea data-path="backstory.fobias"></textarea></label>
+          <label>Tomos Arcanos, Feitiços e Artefatos <textarea data-path="backstory.tomos"></textarea></label>
+          <label>Encontros com Entidades Estranhas <textarea data-path="backstory.encontros"></textarea></label>
+        </div>
+      </section>
+
+      <section class="card section-gear-finance" aria-labelledby="sec-gear">
+        <div class="section-header"><h2 id="sec-gear">Equipamentos e Finanças</h2></div>
+        <div class="gear-finance-grid">
+          <div class="gear-block">
+            <h3>Equipamentos e Posses</h3>
+            <div id="gearList" class="dynamic-list"></div>
+            <button id="addGearBtn" class="btn small tonal no-print" type="button">+ Item</button>
+          </div>
+          <div class="finance-block">
+            <h3>Finanças</h3>
+            <div class="finance-fields">
+              <div class="readonly-field">Nível de Crédito: <strong id="creditRatingDisplay" class="num">-</strong></div>
+              <label>Dinheiro <input type="text" data-path="finance.dinheiro"></label>
+              <label>Bens <textarea data-path="finance.bens"></textarea></label>
+              <label>Gastos Diários <input type="text" data-path="finance.gastos"></label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="resetDialog">
+    <form method="dialog" class="dialog-content">
+      <h3>Limpar ficha?</h3>
+      <p>Isso apagará todos os dados atuais e restaurará os valores padrão. Deseja continuar?</p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn tonal">Cancelar</button>
+        <button id="confirmResetBtn" value="confirm" class="btn danger">Limpar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

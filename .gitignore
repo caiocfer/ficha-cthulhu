@@ -1,0 +1,12 @@
+# Reference/source files (do not publish)
+*.pdf
+SPEC.md
+SPEC.md.original.md
+
+# OS/editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
